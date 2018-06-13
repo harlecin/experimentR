@@ -20,3 +20,4 @@ To do that the following features are planned:
 - PowerBI dashboard
 
 Hopefully, the above does not remain a wish list:)
+
