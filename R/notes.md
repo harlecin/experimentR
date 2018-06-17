@@ -23,3 +23,6 @@ R6list <- R6Class(
 as.list.R6list <- function(x, ...) {
   x$as.list()
 }
+
+similar stuff for python:
+- https://github.com/mitdbg/modeldb/blob/master/server/codegen/sqlite/createDb.sql
