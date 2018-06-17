@@ -26,12 +26,13 @@ log = function(x, ...) {
 #' @export
 log.train = function(caret_train, experiment, description = NULL) {
   experiment$description = description
+  experiment$commit_id = system("git rev-parse --short HEAD", intern = TRUE)
   experiment$datetime_recorded = paste0(Sys.Date()," ", Sys.time())
   experiment$method = caret_train$method
   experiment$model_type = caret_train$modelType
   experiment$model_label = caret_train$modelInfo$label
 
-  ## Control settings
+  ## trainControl settings
   experiment$control = caret_train$control
 
   ## change from wide to long!
@@ -73,3 +74,4 @@ log.default = function(metric_name, metric, experiment) {
 
 # TODO
 # - refactor common logging part from .train and .default into function log_base()
+# - add check if project is under version control to record commit id
