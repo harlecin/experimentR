@@ -25,6 +25,7 @@ new_experiment = function(project, experiment_name, experimenter = Sys.getenv("U
 # https://github.com/topepo/caret/blob/9a435dcc5b3a115130c79bf8b012d4b9f2fe212d/pkg/caret/R/train.default.R
 
 ## TODO:
-## add check whether there already is an experiment saved for local project,
-## if yes, ask if it should be reused
-## use_existing <- readline(prompt="Do you want to continue your previous experiment? [y]/[n]: ")
+## - add check whether there already is an experiment saved for local project,
+##    if yes, ask if it should be reused
+##    use_existing <- readline(prompt="Do you want to continue your previous experiment? [y]/[n]: ")
+## - option to query existing projects so user can add experiment to existing project
