@@ -3,14 +3,15 @@
 #' Use this function to create an experiment environment that holds all information
 #' about which experiment was run by who with what results
 #'
-#'
-#' @param experiment_name
-#' @param experimenter
-#' @return experiment environment
-new_experiment = function(experiment_name, experimenter = Sys.getenv("USERNAME")) {
+#' @param project A character string giving the project name used to group experiments
+#' @param experiment_name A character string name of the current experiment
+#' @param experimenter A character string specifying who ran the experiment
+#' @return An experiment environment
+new_experiment = function(project, experiment_name, experimenter = Sys.getenv("USERNAME")) {
   env = new.env()
   class(env) = "experiment"
 
+  env$project = project
   env$experiment_name = experiment_name
   env$experimenter = experimenter
 
