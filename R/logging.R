@@ -25,7 +25,7 @@ log = function(x, ...) {
 #' @param description An optional character string describing the experiment run
 #' @param data_used A character string specifying the dataset or data source
 #' @export
-log.train = function(caret_train, experiment, description = NULL, data_used = NULL) {
+log.train = function(caret_train, experiment, description = NA, data_used = NA) {
 
 
   ## casting tuning results form wide to long
@@ -62,31 +62,6 @@ log.train = function(caret_train, experiment, description = NULL, data_used = NU
                                             )
                                           )
 
-
-  # experiment$dim.run_metrics = rbind(experiment$dim.run_metrics,
-  #                                    run_metrics = list(tune_results)
-  #                                    )
-  ## change from wide to long!
-  ## tuning results
-  # experiment$tuning_results = caret_train$results
-
-  ## resample values for final model
-  # experiment$resampling_results = caret_train$resample
-  ## change format - why is final-user > final-elapsed?
-  # experiment$timing = caret_train$times
-
-  ## create run-history:
-  ## - new run is added to current experiment
-  ## - new data is appended
-
-  ## add features used
-  # y = caret_train$terms[[2]]
-  # X = caret_train$terms[[3]]
-  ## same data used?
-  ## capture set.seed() used
-  ## add feature importance
-  ##
-
 }
 
 #' Log arbitrary metrics provided as key-value pairs
@@ -99,7 +74,7 @@ log.train = function(caret_train, experiment, description = NULL, data_used = NU
 #' @param experiment An experiment object to store your metrics in
 #' @return NULL
 log.default = function(metric_name, metric, experiment) {
-
+  cat("Not implemented yet, sry :(")
 }
 
 ## Testing
@@ -110,6 +85,8 @@ log.default = function(metric_name, metric, experiment) {
 # - refactor common logging part from .train and .default into function log_base()
 # - add check if project is under version control to record commit id
 # - add checks for inputs
+#   - terms attribute -> only valid for formulas?
 # - pretty print feature string (remove blanks, etc)
 # - overfit measure from mlr
 # - swap rbind() for rbindlist()
+# - check times attribute: Why is elapsed < user + system?
