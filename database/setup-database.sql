@@ -88,6 +88,15 @@ begin
 	)
 end
 
+
+drop table if exists dbo.tuning_results
+begin
+	create table dbo.tuning_results (
+	run_id int,
+	hyperparam nvarchar(255),
+	value numeric
+	)
+end
 -- TODO:
 /*
 - Check CASCADE/UPDATE behaviour for foreign keys
