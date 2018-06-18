@@ -3,16 +3,18 @@
 #' Use this function to create an experiment environment that holds all information
 #' about which experiment was run by who with what results
 #'
-#' @param project_name A character string giving the project name used to group experiments
-#' @param project_description A character string describing the project in more detail
 #' @param experiment_name A character string name of the current experiment
 #' @param experiment_author A character string specifying who ran the experiment
 #' @param experiment_description A character string giving a short description
+#' @param project_name A character string giving the project name used to group experiments
+#' @param project_description A character string describing the project in more detail
 #' @return An experiment environment
 #' @import data.table
-new_experiment = function(project_name, project_description,
-                          experiment_name, experiment_author = Sys.getenv("USERNAME"),
-                          experiment_description) {
+new_experiment = function(experiment_name,
+                          experiment_author = Sys.getenv("USERNAME"),
+                          experiment_description = NA,
+                          project_name = "default",
+                          project_description = "default project") {
 
   env = new.env()
   class(env) = "experiment"
