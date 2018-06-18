@@ -43,21 +43,54 @@ upload_experiment.sqlserver = function(con_string, experiment) {
     experiment_record = DBI::dbGetQuery(con, paste0("SELECT * FROM dbo.experiments WHERE experiment_name ='",experiment_name,"'"))
   }
 
-  ## insert runs except tune_results and resampling_results:
-  dbBegin(con)
-  DBI::dbWriteTable(conn = con,
-                    name = "experiment_runs",
-                    data.table(experiment_id = experiment_record$experiment_id,
-                               project_id = project_record$project_id,
-                               experiment$fact.experiment_runs[,!c("tune_results", "resampling_results"), with = F]),
-                    append = T)
+  experiment_runs_datetime_client = unique(experiment$fact.experiment_runs$datetime_recorded)
+  experiment_runs_datetime_server = DBI::dbGetQuery(con, paste0("SELECT run_id, datetime_recorded FROM dbo.experiment_runs WHERE datetime_recorded in (",paste0("'",paste0(experiment_runs_datetime_client, collapse = "', '"),"'",collapse = ""),")"))
 
-  scope_identity = DBI::dbGetQuery(con, "SELECT SCOPE_IDENTITY() from dbo.experiment_runs")
-  dbCommit(con)
+  delta_runs_recorded = !(experiment_runs_datetime_client %in% experiment_runs_datetime_server$datetime_recorded)
+
+  experiment_runs_missing = experiment_runs_datetime_client[delta_runs_recorded]
+
+  if (length(experiment_runs_missing) != 0) {
+    ## insert runs except tune_results and resampling_results:
+    DBI::dbWriteTable(conn = con,
+                      name = "experiment_runs",
+                      data.table(experiment_id = experiment_record$experiment_id,
+                                 project_id = project_record$project_id,
+                                 experiment$fact.experiment_runs[datetime_recorded %in% experiment_runs_missing,!c("tune_results", "resampling_results"), with = F]),
+                      append = T)
+
+    experiment_runs_datetime_server = DBI::dbGetQuery(con, paste0("SELECT run_id, datetime_recorded FROM dbo.experiment_runs WHERE datetime_recorded in (",paste0("'",paste0(experiment_runs_datetime_client, collapse = "', '"),"'",collapse = ""),")"))
+    ## include? code has to run from top anyway...
+    delta_runs_recorded = !(experiment_runs_datetime_client %in% experiment_runs_datetime_server$datetime_recorded)
+    experiment_runs_missing = experiment_runs_datetime_client[delta_runs_recorded]
+  }
+
+  ## run_id and datetime_recorded have to be filtered from experiment list -> looping to add entries to table!
+  # run_ids = experiment_runs_datetime_server$run_id
+  #
+  # for (i in seq_along(run_ids)) {
+  #   DBI::dbWriteTable(conn = con,
+  #                     name = "tuning_results",
+  #                     data.table(run_id = run_ids[[i]],
+  #                                experiment$fact.experiment_runs$tune_results[[i]]),
+  #                     append = T)
+  # }
+
+  # dbWriteTable(con, "cars", head(cars, 3))
+  # dbExecute(
+  #   con,
+  #   "INSERT INTO cars (speed, dist) VALUES (1, 1), (2, 2), (3, 3)"
+  # )
+
+  ## OUTPUT,@@identity etc not working?
+  # DBI::dbGetQuery(con, "SELECT SCOPE_IDENTITY()")
+  # dbCommit(con)
+  # dbDisconnect(con)
 }
 
 # TODO:
 # - check why dbWriteTable does not work with schemas other than dbo
+# - check if dbWriteTable attribute is 0, else do not insert records -> necessary?
 # - add foreign keys to database again?
 # - refactor above into functions to check if record exists
 # - record primary keys inserted for given records in experiment_runs
@@ -70,3 +103,17 @@ upload_experiment.sqlserver = function(con_string, experiment) {
 #
 # table_id = DBI::Id(schema = "dim",
 #              table = "test")
+
+#
+# sql_values <- sqlData(con, values, row.names)
+# table <- dbQuoteIdentifier(con, table)
+# fields <- dbQuoteIdentifier(con, names(sql_values))
+#
+# # Convert fields into a character matrix
+# rows <- do.call(paste, c(sql_values, sep = ", "))
+# SQL(paste0(
+#   "INSERT INTO ", table, "\n",
+#   "  (", paste(fields, collapse = ", "), ")\n",
+#   "VALUES\n",
+#   paste0("  (", rows, ")", collapse = ",\n")
+# ))
