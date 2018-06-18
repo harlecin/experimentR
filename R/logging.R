@@ -23,26 +23,43 @@ log = function(x, ...) {
 #' @param caret_train A train object from caret
 #' @param experiment An experiment object
 #' @param description An optional character string describing the experiment run
+#' @param data_used A character string specifying the dataset or data source
 #' @export
-log.train = function(caret_train, experiment, description = NULL) {
-  experiment$description = description
-  experiment$commit_id = system("git rev-parse --short HEAD", intern = TRUE)
-  experiment$datetime_recorded = paste0(Sys.Date()," ", Sys.time())
-  experiment$method = caret_train$method
-  experiment$model_type = caret_train$modelType
-  experiment$model_label = caret_train$modelInfo$label
+log.train = function(caret_train, experiment, description = NULL, data_used = NULL) {
 
-  ## trainControl settings
-  experiment$control = caret_train$control
 
+  experiment$fact.experiment_runs = rbind(experiment$fact.experiment_runs,
+                                          list(
+                                            datetime_recorded = as.character(Sys.time()),
+                                            run_description = description,
+                                            commit_id = system("git rev-parse --short HEAD", intern = TRUE),
+                                            model_method = caret_train$method,
+                                            model_type = caret_train$modelType,
+                                            model_label = caret_train$modelInfo$label,
+                                            model_validation_technique = paste0(caret_train$control$number, "x",
+                                                                                caret_train$control$repeats, " ",
+                                                                                caret_train$control$method),
+                                            model_response = caret_train$terms[[2]],
+                                            model_features = paste0(deparse((caret_train$terms[[3]])), collapse = ""),
+                                            model_total_train_time = caret_train$times$everything[[3]],
+                                            data_used = data_used
+                                            )
+                                          )
+
+  ## casting tuning results form wide to long
+  tune_results = melt.data.table(setDT(caret_train$results), variable.name = "hyperparam", value.name = "value")
+
+  experiment$dim.run_metrics = rbind(experiment$dim.run_metrics,
+                                     run_metrics = list(tune_results)
+                                     )
   ## change from wide to long!
   ## tuning results
-  experiment$tuning_results = caret_train$results
+  # experiment$tuning_results = caret_train$results
 
   ## resample values for final model
-  experiment$resampling_results = caret_train$resample
+  # experiment$resampling_results = caret_train$resample
   ## change format - why is final-user > final-elapsed?
-  experiment$timing = caret_train$times
+  # experiment$timing = caret_train$times
 
   ## create run-history:
   ## - new run is added to current experiment
@@ -54,7 +71,7 @@ log.train = function(caret_train, experiment, description = NULL) {
   ## same data used?
   ## capture set.seed() used
   ## add feature importance
-  ## overfit measure from mlr
+  ##
 
 }
 
@@ -75,3 +92,6 @@ log.default = function(metric_name, metric, experiment) {
 # TODO
 # - refactor common logging part from .train and .default into function log_base()
 # - add check if project is under version control to record commit id
+# - add checks for inputs
+# - pretty print feature string (remove blanks, etc)
+# - overfit measure from mlr

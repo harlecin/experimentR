@@ -4,19 +4,42 @@
 #' about which experiment was run by who with what results
 #'
 #' @param project_name A character string giving the project name used to group experiments
+#' @param project_description A character string describing the project in more detail
 #' @param experiment_name A character string name of the current experiment
 #' @param experiment_author A character string specifying who ran the experiment
 #' @param experiment_description A character string giving a short description
 #' @return An experiment environment
-new_experiment = function(project_name, experiment_name, experiment_author = Sys.getenv("USERNAME")) {
+#' @import data.table
+new_experiment = function(project_name, project_description,
+                          experiment_name, experiment_author = Sys.getenv("USERNAME"),
+                          experiment_description) {
+
   env = new.env()
   class(env) = "experiment"
 
-  env$project_name = project_name
-  env$experiment_name = experiment_name
-  env$experiment_author = experiment_author
-  env$experiment_description = experiment_description
+  env$dim.projects = data.table(project_name = project_name,
+                                project_description = project_description
+                                )
 
+  env$dim.experiments = data.table(experiment_name = experiment_name,
+                                   experiment_author = experiment_author,
+                                   experiment_description = experiment_description
+                                   )
+
+  experiment$dim.run_metrics = NULL
+  #
+  env$fact.experiment_runs = data.table(datetime_recorded = character(),
+                                        run_description = character(),
+                                        commit_id = character(),
+                                        model_method = character(),
+                                        model_type = character(),
+                                        model_label = character(),
+                                        model_validation_technique = character(),
+                                        model_response = character(),
+                                        model_features = character(),
+                                        model_total_train_time = numeric(),
+                                        data_used = character()
+                                        )
   env
 }
 
@@ -31,3 +54,4 @@ new_experiment = function(project_name, experiment_name, experiment_author = Sys
 ##    if yes, ask if it should be reused
 ##    use_existing <- readline(prompt="Do you want to continue your previous experiment? [y]/[n]: ")
 ## - option to query existing projects so user can add experiment to existing project
+## - make project description optional if existing project is used
