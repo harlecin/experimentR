@@ -46,6 +46,7 @@ begin
 	)
 end
 
+-- foreign key constraint --> needs to be declared after fact.experiment_runs!
 drop table if exists dim.run_metrics
 begin
 	create table dim.run_metrics (
@@ -80,6 +81,7 @@ begin
 	model_validation_technique nvarchar(255),
 	model_response nvarchar(255),
 	model_features nvarchar(2048),
+	model_total_train_time numeric, 
 	data_used nvarchar(255)
 	)
 end
