@@ -77,9 +77,6 @@ log.default = function(metric_name, metric, experiment) {
   cat("Not implemented yet, sry :(")
 }
 
-## Testing
-# experiment = new_experiment("asdf", "asdf", "adsf", "adf", "adsf")
-# log(caret_train, experiment, "asdf", "asdf")
 
 # TODO
 # - refactor common logging part from .train and .default into function log_base()
