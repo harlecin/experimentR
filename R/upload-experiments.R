@@ -95,25 +95,6 @@ upload_experiment.sqlserver = function(con_string, experiment) {
 # - refactor above into functions to check if record exists
 # - record primary keys inserted for given records in experiment_runs
 #   - use those keys to insert tune_results and resampling_results into separate tables
+#       -> currently workaround based on datetime_recorded! Refactor?
 #   - how should we handle duplicate runs?
 
-
-# Code snippets:
-# dbGetQuery(conn = con, "SELECT * FROM testSAM.test_schema2.hcai_unit_tests")
-#
-# table_id = DBI::Id(schema = "dim",
-#              table = "test")
-
-#
-# sql_values <- sqlData(con, values, row.names)
-# table <- dbQuoteIdentifier(con, table)
-# fields <- dbQuoteIdentifier(con, names(sql_values))
-#
-# # Convert fields into a character matrix
-# rows <- do.call(paste, c(sql_values, sep = ", "))
-# SQL(paste0(
-#   "INSERT INTO ", table, "\n",
-#   "  (", paste(fields, collapse = ", "), ")\n",
-#   "VALUES\n",
-#   paste0("  (", rows, ")", collapse = ",\n")
-# ))
