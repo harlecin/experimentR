@@ -28,8 +28,22 @@ log = function(x, ...) {
 log.train = function(caret_train, experiment, description = NULL, data_used = NULL) {
 
 
+  ## casting tuning results form wide to long
+  tune_results = suppressWarnings(melt.data.table(as.data.table(caret_train$results),
+                                                  variable.name = "hyperparam",
+                                                  value.name = "value"
+                                                  )
+                                  )
+
+  ## casting resampling results from wide to long
+  resampling_results = melt.data.table(as.data.table(caret_train$resample),
+                                       id.vars = "Resample",
+                                       variable.name = "metric",
+                                       value.name = "value"
+                                       )
+
   experiment$fact.experiment_runs = rbind(experiment$fact.experiment_runs,
-                                          list(
+                                          data.table(
                                             datetime_recorded = as.character(Sys.time()),
                                             run_description = description,
                                             commit_id = system("git rev-parse --short HEAD", intern = TRUE),
@@ -42,16 +56,16 @@ log.train = function(caret_train, experiment, description = NULL, data_used = NU
                                             model_response = caret_train$terms[[2]],
                                             model_features = paste0(deparse((caret_train$terms[[3]])), collapse = ""),
                                             model_total_train_time = caret_train$times$everything[[3]],
-                                            data_used = data_used
+                                            data_used = data_used,
+                                            tune_results = list(tune_results),
+                                            resampling_results = list(resampling_results)
                                             )
                                           )
 
-  ## casting tuning results form wide to long
-  tune_results = melt.data.table(setDT(caret_train$results), variable.name = "hyperparam", value.name = "value")
 
-  experiment$dim.run_metrics = rbind(experiment$dim.run_metrics,
-                                     run_metrics = list(tune_results)
-                                     )
+  # experiment$dim.run_metrics = rbind(experiment$dim.run_metrics,
+  #                                    run_metrics = list(tune_results)
+  #                                    )
   ## change from wide to long!
   ## tuning results
   # experiment$tuning_results = caret_train$results
@@ -88,6 +102,9 @@ log.default = function(metric_name, metric, experiment) {
 
 }
 
+## Testing
+# experiment = new_experiment("asdf", "asdf", "adsf", "adf", "adsf")
+# log(caret_train, experiment, "asdf", "asdf")
 
 # TODO
 # - refactor common logging part from .train and .default into function log_base()
@@ -95,3 +112,4 @@ log.default = function(metric_name, metric, experiment) {
 # - add checks for inputs
 # - pretty print feature string (remove blanks, etc)
 # - overfit measure from mlr
+# - swap rbind() for rbindlist()

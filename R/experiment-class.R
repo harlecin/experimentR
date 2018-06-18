@@ -26,8 +26,7 @@ new_experiment = function(project_name, project_description,
                                    experiment_description = experiment_description
                                    )
 
-  experiment$dim.run_metrics = NULL
-  #
+
   env$fact.experiment_runs = data.table(datetime_recorded = character(),
                                         run_description = character(),
                                         commit_id = character(),
@@ -38,7 +37,9 @@ new_experiment = function(project_name, project_description,
                                         model_response = character(),
                                         model_features = character(),
                                         model_total_train_time = numeric(),
-                                        data_used = character()
+                                        data_used = character(),
+                                        tune_results = list(),
+                                        resampling_results = list()
                                         )
   env
 }
