@@ -74,8 +74,8 @@ upload_experiment.sqlserver = function(con_string, experiment) {
   runs_recorded = DBI::dbGetQuery(con, paste0("SELECT * FROM dbo.tuning_results WHERE run_id in (",paste0("'",paste0(run_id, collapse = "', '"),"'",collapse = ""),")"))
 
   delta_run_ids = !(run_id %in% runs_recorded$run_id)
-
-  if (length(delta_run_ids) != 0) {
+  runs_get = run_id[delta_run_ids]
+  if (length(runs_get) != 0) {
     runs_get = run_id[delta_run_ids]
 
     for (i in seq_along(runs_get)) {
@@ -85,7 +85,10 @@ upload_experiment.sqlserver = function(con_string, experiment) {
                                    experiment$fact.experiment_runs$tune_results[[i]]),
                         append = T)
     }
+    runs_recorded = DBI::dbGetQuery(con, paste0("SELECT * FROM dbo.tuning_results WHERE run_id in (",paste0("'",paste0(run_id, collapse = "', '"),"'",collapse = ""),")"))
 
+    delta_run_ids = !(run_id %in% runs_recorded$run_id)
+    runs_get = run_id[delta_run_ids]
   }
 
   DBI::dbDisconnect(con)
