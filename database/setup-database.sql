@@ -93,8 +93,9 @@ drop table if exists dbo.tuning_results
 begin
 	create table dbo.tuning_results (
 	run_id int,
+	tuning_run int,
 	hyperparam nvarchar(255),
-	value numeric
+	[value] numeric
 	)
 end
 -- TODO:

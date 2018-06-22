@@ -74,6 +74,28 @@
 #   similar stuff for python:
 #     - https://github.com/mitdbg/modeldb/blob/master/server/codegen/sqlite/createDb.sql
 
+# dbWriteTable(con, "cars", head(cars, 3))
+# dbExecute(
+#   con,
+#   "INSERT INTO cars (speed, dist) VALUES (1, 1), (2, 2), (3, 3)"
+# )
+
+## OUTPUT,@@identity etc not working?
+# DBI::dbGetQuery(con, "SELECT SCOPE_IDENTITY()")
+# dbCommit(con)
+# dbDisconnect(con)
+
+
+
+
+## get project record
+# SQL injection protection not necessary here
+# project_name = experiment$dim.projects$project_name
+# project_record = dbSendQuery(con, "SELECT * FROM dbo.projects  WHERE project_name = ?")
+# dbBind(project_record, list(project_name))
+# dbFetch(project_record)
+# dbClearResult(project_record)
+
 # TODO
 # -print() method to show runs
 # -summary() method to show overview
