@@ -29,7 +29,9 @@ log.train = function(caret_train, experiment, description = NA, data_used = NA) 
 
 
   ## casting tuning results form wide to long
-  tune_results = suppressWarnings(melt.data.table(as.data.table(caret_train$results),
+  tune_results = suppressWarnings(melt.data.table(data.table(tuning_run = 1:nrow(caret_train$results),
+                                                             caret_train$results),
+                                                  id.vars = "tuning_run",
                                                   variable.name = "hyperparam",
                                                   value.name = "value"
                                                   )
@@ -79,6 +81,7 @@ log.default = function(metric_name, metric, experiment) {
 
 
 # TODO
+# - ADD tuning_run column for tune_results so we see which parameters belong together
 # - refactor common logging part from .train and .default into function log_base()
 # - add check if project is under version control to record commit id
 # - add checks for inputs
